@@ -23,6 +23,7 @@ Matcha's [classes documentation](https://docs.matchascripts.com/classes) lists `
 ## Controls and features
 
 - **Right Shift** opens or hides the compact menu. Left Shift does nothing.
+- Drag the **FALLEN / RIFT** header to move the menu. Click **X** at the top right to hide it; Right Shift opens it again.
 - **End** unloads the script and removes its Drawing objects.
 - Player ESP shows boxes, labels, range, health, and optional snaplines.
 - Optional aim assist moves the mouse toward the nearest on-screen player inside the FOV circle while right mouse is held and the menu is closed.

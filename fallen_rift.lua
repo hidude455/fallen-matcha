@@ -124,11 +124,34 @@ local function sliderRow(x, y, w, title, hint, value, minValue, maxValue, mx, my
     return value
 end
 
+local menuPosition = { x = nil, y = nil, dragging = false, offsetX = 0, offsetY = 0 }
 local function drawMenu(mx, my, click, held)
-    if not cfg.menu then hideUnused(); return end
+    if not cfg.menu then menuPosition.dragging = false; hideUnused(); return end
     local viewport = Workspace.CurrentCamera.ViewportSize
-    local x = math.floor((viewport.X - 590) / 2)
-    local y = math.floor((viewport.Y - 440) / 2)
+    if menuPosition.x == nil then
+        menuPosition.x = math.floor((viewport.X - 590) / 2)
+        menuPosition.y = math.floor((viewport.Y - 440) / 2)
+    end
+    local maxX, maxY = math.max(0, viewport.X - 590), math.max(0, viewport.Y - 440)
+    menuPosition.x = clamp(menuPosition.x, 0, maxX)
+    menuPosition.y = clamp(menuPosition.y, 0, maxY)
+    local x, y = menuPosition.x, menuPosition.y
+    if not held then menuPosition.dragging = false end
+    if click and pointIn(mx, my, x + 550, y + 12, 30, 29) then
+        cfg.menu = false
+        menuPosition.dragging = false
+        hideUnused()
+        return
+    end
+    if click and (pointIn(mx, my, x, y, 139, 86) or pointIn(mx, my, x + 140, y, 410, 12)) then
+        menuPosition.dragging = true
+        menuPosition.offsetX, menuPosition.offsetY = mx - x, my - y
+    end
+    if menuPosition.dragging and held then
+        x = clamp(mx - menuPosition.offsetX, 0, maxX)
+        y = clamp(my - menuPosition.offsetY, 0, maxY)
+        menuPosition.x, menuPosition.y = x, y
+    end
     rect(x + 6, y + 7, 590, 440, theme.bg, 9)
     local base = rect(x, y, 590, 440, theme.panel, 8)
     base.Transparency = 0.94
@@ -137,6 +160,7 @@ local function drawMenu(mx, my, click, held)
     side.Transparency = 0.95
     label(x + 19, y + 22, "FALLEN", theme.text, 19, true)
     label(x + 20, y + 49, "R I F T", accents[cfg.accent], 10, true)
+    label(x + 20, y + 70, "DRAG TO MOVE", theme.muted, 9)
     line(x + 139, y + 1, x + 139, y + 439, theme.line)
     local tabNames = { "OVERVIEW", "AIMBOT", "VISUALS", "WORLD", "MISC" }
     for i = 1, 5 do
@@ -151,11 +175,13 @@ local function drawMenu(mx, my, click, held)
 
     local topNames = { "Home", "Aim", "Players", "Items", "Settings" }
     for i = 1, 5 do
-        local tx = x + 153 + (i - 1) * 86
-        if i == cfg.tab then rect(tx, y + 13, 79, 27, accents[cfg.accent], 13) end
+        local tx = x + 153 + (i - 1) * 78
+        if i == cfg.tab then rect(tx, y + 13, 72, 27, accents[cfg.accent], 13) end
         label(tx + 10, y + 19, topNames[i], i == cfg.tab and theme.white or theme.muted, 10, i == cfg.tab)
-        if click and pointIn(mx, my, tx, y + 13, 79, 27) then cfg.tab = i end
+        if click and pointIn(mx, my, tx, y + 13, 72, 27) then cfg.tab = i end
     end
+    rect(x + 550, y + 13, 30, 27, theme.raised, 5)
+    label(x + 560, y + 19, "X", theme.coral, 11, true)
     line(x + 140, y + 51, x + 589, y + 51, theme.line)
     local bx, by, bw = x + 161, y + 61, 405
     label(bx, by, tabNames[cfg.tab], theme.text, 18, true)

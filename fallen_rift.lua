@@ -3,6 +3,7 @@
 -- Right Shift: show/hide menu  |  End: unload  |  Right mouse: hold aim assist
 
 local PLACE_ID = 10228136016
+local VERSION = "0.3"
 if game.PlaceId ~= PLACE_ID then
     notify("Open Fallen Survival before running this script.", "FALLEN / RIFT", 4)
     return
@@ -38,8 +39,13 @@ local cfg = {
     snaplines = false, teammates = false, maxDistance = 450,
     aim = false, aimFov = 150, smooth = 8, showFov = true,
     world = true, nodes = true, barrels = true, plants = true, crates = true,
-    glowSelected = true, worldRange = 300, noclip = false, spider = false,
-    climbSpeed = 18, cameraFov = 70
+    glowSelected = true, itemOutlines = false, worldRange = 300, worldPage = 1,
+    crosshair = false, crosshairSize = 7,
+    noclip = false, spider = false, climbSpeed = 18,
+    cameraFov = 70, zoom = false, zoomFov = 35, cameraPage = 1,
+    thirdPerson = false, thirdDistance = 8, freecam = false, freecamSpeed = 2,
+    screenTint = false, tintStrength = 12,
+    triggerClick = false, fastClick = false, hitRange = 25, hitInterval = 180
 }
 
 local allDrawings = {}
@@ -109,6 +115,14 @@ local function menuRow(x, y, w, title, hint, on, mx, my, click)
     rect(x + w - (on and 30 or 45), y + 19, 14, 14, theme.white, 7)
     return click and pointIn(mx, my, x, y, w, 53)
 end
+local function choiceRow(x, y, w, title, hint, value, mx, my, click)
+    rect(x, y, w, 53, theme.raised, 7)
+    label(x + 13, y + 7, title, theme.text, 13, true)
+    label(x + 13, y + 27, hint, theme.muted, 10)
+    rect(x + w - 93, y + 13, 79, 27, theme.line, 6)
+    label(x + w - 84, y + 20, value, accents[cfg.accent], 10, true)
+    return click and pointIn(mx, my, x, y, w, 53)
+end
 local function sliderRow(x, y, w, title, hint, value, minValue, maxValue, mx, my, held)
     rect(x, y, w, 66, theme.raised, 7)
     label(x + 13, y + 7, title, theme.text, 13, true)
@@ -162,9 +176,9 @@ local function drawMenu(mx, my, click, held)
     label(x + 20, y + 49, "R I F T", accents[cfg.accent], 10, true)
     label(x + 20, y + 70, "DRAG TO MOVE", theme.muted, 9)
     line(x + 139, y + 1, x + 139, y + 439, theme.line)
-    local tabNames = { "OVERVIEW", "AIMBOT", "VISUALS", "WORLD", "MISC" }
-    for i = 1, 5 do
-        local ty = y + 91 + (i - 1) * 47
+    local tabNames = { "OVERVIEW", "AIMBOT", "VISUALS", "WORLD", "COMBAT", "CAMERA", "MISC" }
+    for i = 1, 7 do
+        local ty = y + 91 + (i - 1) * 41
         if i == cfg.tab then rect(x + 8, ty, 123, 36, accents[cfg.accent], 5) end
         label(x + 22, ty + 10, tabNames[i], i == cfg.tab and theme.white or theme.muted, 11, i == cfg.tab)
         if click and pointIn(mx, my, x + 8, ty, 123, 36) then cfg.tab = i end
@@ -173,12 +187,12 @@ local function drawMenu(mx, my, click, held)
     label(x + 20, y + 400, "RSHIFT  HIDE", theme.muted, 9)
     label(x + 20, y + 416, "END     UNLOAD", theme.muted, 9)
 
-    local topNames = { "Home", "Aim", "Players", "Items", "Settings" }
-    for i = 1, 5 do
-        local tx = x + 153 + (i - 1) * 78
-        if i == cfg.tab then rect(tx, y + 13, 72, 27, accents[cfg.accent], 13) end
-        label(tx + 10, y + 19, topNames[i], i == cfg.tab and theme.white or theme.muted, 10, i == cfg.tab)
-        if click and pointIn(mx, my, tx, y + 13, 72, 27) then cfg.tab = i end
+    local topNames = { "Home", "Aim", "ESP", "Loot", "Fight", "Camera", "Misc" }
+    for i = 1, 7 do
+        local tx = x + 145 + (i - 1) * 58
+        if i == cfg.tab then rect(tx, y + 13, 54, 27, accents[cfg.accent], 13) end
+        label(tx + 5, y + 19, topNames[i], i == cfg.tab and theme.white or theme.muted, 10, i == cfg.tab)
+        if click and pointIn(mx, my, tx, y + 13, 54, 27) then cfg.tab = i end
     end
     rect(x + 550, y + 13, 30, 27, theme.raised, 5)
     label(x + 560, y + 19, "X", theme.coral, 11, true)
@@ -223,15 +237,73 @@ local function drawMenu(mx, my, click, held)
         rowY = rowY + 57
         if menuRow(bx, rowY, bw, "Snaplines", "Lines from the lower screen edge", cfg.snaplines, mx, my, click) then cfg.snaplines = not cfg.snaplines end
     elseif cfg.tab == 4 then
-        if menuRow(bx, rowY, bw, "World ESP", "Master resource overlay", cfg.world, mx, my, click) then cfg.world = not cfg.world end
+        local pageX = bx + bw - 112
+        rect(pageX, by + 25, 52, 23, cfg.worldPage == 1 and accents[cfg.accent] or theme.raised, 5)
+        rect(pageX + 56, by + 25, 52, 23, cfg.worldPage == 2 and accents[cfg.accent] or theme.raised, 5)
+        label(pageX + 12, by + 30, "ESP", theme.white, 10, true)
+        label(pageX + 64, by + 30, "EXTRA", theme.white, 10, true)
+        if click and pointIn(mx, my, pageX, by + 25, 52, 23) then cfg.worldPage = 1 end
+        if click and pointIn(mx, my, pageX + 56, by + 25, 52, 23) then cfg.worldPage = 2 end
+        if cfg.worldPage == 1 then
+            if menuRow(bx, rowY, bw, "World ESP", "Master resource overlay", cfg.world, mx, my, click) then cfg.world = not cfg.world end
+            rowY = rowY + 57
+            if menuRow(bx, rowY, bw, "Nodes", "Ore, stone, sulfur and wood", cfg.nodes, mx, my, click) then cfg.nodes = not cfg.nodes end
+            rowY = rowY + 57
+            if menuRow(bx, rowY, bw, "Barrels + crates", "Loot containers", cfg.barrels and cfg.crates, mx, my, click) then cfg.barrels = not cfg.barrels; cfg.crates = cfg.barrels end
+            rowY = rowY + 57
+            if menuRow(bx, rowY, bw, "Plants", "Hemp, berries and crops", cfg.plants, mx, my, click) then cfg.plants = not cfg.plants end
+            rowY = rowY + 57
+            if menuRow(bx, rowY, bw, "Selected glow", "Alt + click a marker to focus it", cfg.glowSelected, mx, my, click) then cfg.glowSelected = not cfg.glowSelected end
+        else
+            if menuRow(bx, rowY, bw, "Item outlines", "Screen-space outlines around resources", cfg.itemOutlines, mx, my, click) then cfg.itemOutlines = not cfg.itemOutlines end
+            rowY = rowY + 57
+            if menuRow(bx, rowY, bw, "Crosshair", "Center reticle drawn by Matcha", cfg.crosshair, mx, my, click) then cfg.crosshair = not cfg.crosshair end
+            rowY = rowY + 64
+            cfg.crosshairSize = sliderRow(bx, rowY, bw, "Crosshair size", "Reticle arm length in pixels", cfg.crosshairSize, 3, 20, mx, my, held)
+            rowY = rowY + 76
+            cfg.worldRange = sliderRow(bx, rowY, bw, "World range", "Maximum resource distance", cfg.worldRange, 50, 600, mx, my, held)
+        end
+    elseif cfg.tab == 5 then
+        if menuRow(bx, rowY, bw, "Target click", "Right mouse + target near crosshair", cfg.triggerClick, mx, my, click) then cfg.triggerClick = not cfg.triggerClick end
         rowY = rowY + 57
-        if menuRow(bx, rowY, bw, "Nodes", "Ore, stone, sulfur and wood", cfg.nodes, mx, my, click) then cfg.nodes = not cfg.nodes end
-        rowY = rowY + 57
-        if menuRow(bx, rowY, bw, "Barrels + crates", "Loot containers", cfg.barrels and cfg.crates, mx, my, click) then cfg.barrels = not cfg.barrels; cfg.crates = cfg.barrels end
-        rowY = rowY + 57
-        if menuRow(bx, rowY, bw, "Plants", "Hemp, berries and crops", cfg.plants, mx, my, click) then cfg.plants = not cfg.plants end
-        rowY = rowY + 57
-        if menuRow(bx, rowY, bw, "Selected glow", "Alt + click a marker to focus it", cfg.glowSelected, mx, my, click) then cfg.glowSelected = not cfg.glowSelected end
+        if menuRow(bx, rowY, bw, "Fast click", "Hold V to repeat left click", cfg.fastClick, mx, my, click) then cfg.fastClick = not cfg.fastClick end
+        rowY = rowY + 64
+        cfg.hitRange = sliderRow(bx, rowY, bw, "Target range", "Maximum target distance", cfg.hitRange, 5, 60, mx, my, held)
+        rowY = rowY + 76
+        cfg.hitInterval = sliderRow(bx, rowY, bw, "Click interval", "Milliseconds between clicks", cfg.hitInterval, 90, 500, mx, my, held)
+        rowY = rowY + 76
+        label(bx, rowY, "Requires an equipped tool and game acceptance", theme.muted, 10)
+    elseif cfg.tab == 6 then
+        local pageX = bx + bw - 112
+        rect(pageX, by + 25, 52, 23, cfg.cameraPage == 1 and accents[cfg.accent] or theme.raised, 5)
+        rect(pageX + 56, by + 25, 52, 23, cfg.cameraPage == 2 and accents[cfg.accent] or theme.raised, 5)
+        label(pageX + 10, by + 30, "VIEW", theme.white, 10, true)
+        label(pageX + 64, by + 30, "MODES", theme.white, 10, true)
+        if click and pointIn(mx, my, pageX, by + 25, 52, 23) then cfg.cameraPage = 1 end
+        if click and pointIn(mx, my, pageX + 56, by + 25, 52, 23) then cfg.cameraPage = 2 end
+        if cfg.cameraPage == 1 then
+            cfg.cameraFov = sliderRow(bx, rowY, bw, "Camera FOV", "Base field of view", cfg.cameraFov, 55, 110, mx, my, held)
+            rowY = rowY + 76
+            if menuRow(bx, rowY, bw, "Hold zoom", "Hold Z while menu is closed", cfg.zoom, mx, my, click) then cfg.zoom = not cfg.zoom end
+            rowY = rowY + 64
+            cfg.zoomFov = sliderRow(bx, rowY, bw, "Zoom FOV", "Field of view while holding Z", cfg.zoomFov, 15, 65, mx, my, held)
+            rowY = rowY + 76
+            if menuRow(bx, rowY, bw, "Screen tint", "Transparent accent-color overlay", cfg.screenTint, mx, my, click) then cfg.screenTint = not cfg.screenTint end
+        else
+            if menuRow(bx, rowY, bw, "Third person (beta)", "Camera pulled behind your character", cfg.thirdPerson, mx, my, click) then
+                cfg.thirdPerson = not cfg.thirdPerson
+                if cfg.thirdPerson then cfg.freecam = false end
+            end
+            rowY = rowY + 64
+            cfg.thirdDistance = sliderRow(bx, rowY, bw, "View distance", "Camera distance behind character", cfg.thirdDistance, 4, 18, mx, my, held)
+            rowY = rowY + 76
+            if menuRow(bx, rowY, bw, "Freecam (beta)", "WASD / Q E / arrow keys", cfg.freecam, mx, my, click) then
+                cfg.freecam = not cfg.freecam
+                if cfg.freecam then cfg.thirdPerson = false end
+            end
+            rowY = rowY + 64
+            cfg.freecamSpeed = sliderRow(bx, rowY, bw, "Freecam speed", "Units per frame; Left Shift boosts", cfg.freecamSpeed, 1, 8, mx, my, held)
+        end
     else
         if menuRow(bx, rowY, bw, "Show teammates", "Include same-team players", cfg.teammates, mx, my, click) then cfg.teammates = not cfg.teammates end
         rowY = rowY + 57
@@ -239,9 +311,9 @@ local function drawMenu(mx, my, click, held)
         rowY = rowY + 57
         if menuRow(bx, rowY, bw, "Spider climb", "Hold W into a wall to rise", cfg.spider, mx, my, click) then cfg.spider = not cfg.spider end
         rowY = rowY + 58
-        cfg.cameraFov = sliderRow(bx, rowY, bw, "Camera FOV", "Restore on unload", cfg.cameraFov, 55, 110, mx, my, held)
-        rowY = rowY + 75
-        cfg.worldRange = sliderRow(bx, rowY, bw, "World range", "Maximum resource distance", cfg.worldRange, 50, 600, mx, my, held)
+        if choiceRow(bx, rowY, bw, "Accent color", "Menu, reticle and screen tint", accentNames[cfg.accent], mx, my, click) then cfg.accent = cfg.accent % #accents + 1 end
+        rowY = rowY + 64
+        cfg.tintStrength = sliderRow(bx, rowY, bw, "Tint strength", "Overlay opacity percent", cfg.tintStrength, 3, 25, mx, my, held)
     end
     hideUnused()
 end
@@ -359,13 +431,17 @@ local function scanWorld(myRoot)
     worldCandidates = fresh
 end
 local function newWorldDrawing()
-    local e = { ring = newDraw("Circle"), text = newDraw("Text") }
+    local e = { ring = newDraw("Circle"), text = newDraw("Text"), outline = {} }
     e.ring.Radius, e.ring.NumSides, e.ring.Thickness = 5, 16, 2
     styleText(e.text, 11, false, true, true)
+    for i = 1, 4 do e.outline[i] = newDraw("Line") end
     return e
 end
 local function hideWorld()
-    for _, e in ipairs(worldDrawings) do e.ring.Visible, e.text.Visible = false, false end
+    for _, e in ipairs(worldDrawings) do
+        e.ring.Visible, e.text.Visible = false, false
+        for i = 1, 4 do e.outline[i].Visible = false end
+    end
     for _, l in ipairs(glowLines) do l.Visible = false end
 end
 local function worldColor(kind)
@@ -463,6 +539,26 @@ local function renderWorld(myRoot, mx, my, altClick)
         e.text.Position, e.text.Color = V2(screen.X, screen.Y - 19), color
         e.text.Text = string.upper(entry.name) .. "  " .. tostring(round(distance)) .. "m"
         e.text.Visible = true
+        if cfg.itemOutlines and i <= 24 then
+            local points = {}
+            addPartPoints(entry.part, points)
+            if #points >= 2 then
+                local minX, minY, maxX, maxY = points[1].x, points[1].y, points[1].x, points[1].y
+                for _, point in ipairs(points) do
+                    minX, minY = math.min(minX, point.x), math.min(minY, point.y)
+                    maxX, maxY = math.max(maxX, point.x), math.max(maxY, point.y)
+                end
+                local sides = {
+                    {minX, minY, maxX, minY}, {maxX, minY, maxX, maxY},
+                    {maxX, maxY, minX, maxY}, {minX, maxY, minX, minY}
+                }
+                for side = 1, 4 do
+                    local edge, coords = e.outline[side], sides[side]
+                    edge.From, edge.To, edge.Color, edge.Thickness = V2(coords[1], coords[2]), V2(coords[3], coords[4]), color, 2
+                    edge.Visible = true
+                end
+            end
+        end
         if altClick then
             local dx, dy = screen.X - mx, screen.Y - my
             local score = math.sqrt(dx*dx + dy*dy)
@@ -483,7 +579,6 @@ local function restoreCollisions()
 end
 local warnedNoclip, warnedSpider = false, false
 local function updateMovement(char, root, camera)
-    pcall(function() camera.FieldOfView = cfg.cameraFov end)
     if cfg.noclip then
         if tick() >= nextCollisionUpdate then
             nextCollisionUpdate = tick() + 0.1
@@ -523,11 +618,78 @@ local function updateMovement(char, root, camera)
     end
 end
 
+local cameraFrameBefore, freecamFrame = nil, nil
+local warnedThirdPerson, warnedFreecam = false, false
+local function lookAtFrame(position, target)
+    local forward = (target - position).Unit
+    local up = V3(0, 1, 0)
+    local right = forward:Cross(up)
+    if right.Magnitude < 0.01 then right = V3(1, 0, 0) end
+    right = right.Unit
+    up = right:Cross(forward).Unit
+    return CFrame.new(position.X, position.Y, position.Z,
+        right.X, up.X, -forward.X,
+        right.Y, up.Y, -forward.Y,
+        right.Z, up.Z, -forward.Z)
+end
+local function updateCameraMode(camera, root)
+    if not cfg.thirdPerson and not cfg.freecam then
+        if cameraFrameBefore then pcall(function() camera.CFrame = cameraFrameBefore end) end
+        cameraFrameBefore, freecamFrame = nil, nil
+        return
+    end
+    local mode = cfg.freecam and "freecam" or "third person"
+    local ok, err = pcall(function()
+        local current = camera.CFrame
+        assert(current and current.LookVector, "Camera.CFrame unavailable")
+        if not cameraFrameBefore then cameraFrameBefore = current end
+        local nextFrame
+        if cfg.thirdPerson then
+            freecamFrame = nil
+            local focus = root.Position + V3(0, 2, 0)
+            local position = focus - current.LookVector * cfg.thirdDistance
+            nextFrame = lookAtFrame(position, focus)
+        else
+            freecamFrame = freecamFrame or current
+            local frame = freecamFrame
+            if isrbxactive() and not cfg.menu then
+                local yaw = (iskeypressed(0x27) and 1 or 0) - (iskeypressed(0x25) and 1 or 0)
+                local pitch = (iskeypressed(0x28) and 1 or 0) - (iskeypressed(0x26) and 1 or 0)
+                frame = frame * CFrame.Angles(pitch * 0.025, yaw * 0.025, 0)
+                local speed = cfg.freecamSpeed * (iskeypressed(0xA0) and 3 or 1)
+                local forward = (iskeypressed(0x57) and 1 or 0) - (iskeypressed(0x53) and 1 or 0)
+                local sideways = (iskeypressed(0x44) and 1 or 0) - (iskeypressed(0x41) and 1 or 0)
+                local vertical = (iskeypressed(0x45) and 1 or 0) - (iskeypressed(0x51) and 1 or 0)
+                local position = frame.Position + frame.LookVector * (forward * speed)
+                    + frame.RightVector * (sideways * speed) + V3(0, vertical * speed, 0)
+                local rx, ry, rz = frame:ToOrientation()
+                frame = CFrame.new(position.X, position.Y, position.Z) * CFrame.fromOrientation(rx, ry, rz)
+            end
+            nextFrame = frame
+            freecamFrame = frame
+        end
+        camera.CFrame = nextFrame
+        local applied = camera.CFrame
+        assert((applied.Position - nextFrame.Position).Magnitude < 1, "Camera.CFrame write was ignored")
+    end)
+    if not ok then
+        if cfg.thirdPerson then cfg.thirdPerson = false else cfg.freecam = false end
+        if (mode == "third person" and not warnedThirdPerson) or (mode == "freecam" and not warnedFreecam) then
+            notify(mode .. " unavailable in this Matcha build: " .. tostring(err), "FALLEN / RIFT", 5)
+        end
+        if mode == "third person" then warnedThirdPerson = true else warnedFreecam = true end
+    end
+end
+
 local fovCircle = newDraw("Circle")
 fovCircle.NumSides, fovCircle.Thickness = 64, 1
+local tintOverlay = newDraw("Square")
+local crosshairLines = {}
+for i = 1, 4 do crosshairLines[i] = newDraw("Line") end
+local nextHitTime = 0
 local nextWarn = 0
 local rightShiftWasDown, endWasDown, mouseWasDown = false, false, false
-notify("RIFT loaded. Right Shift opens menu; End unloads.", "FALLEN / RIFT", 4)
+notify("RIFT v" .. VERSION .. " loaded. Right Shift: menu; End: unload.", "FALLEN / RIFT", 4)
 
 while controller.running do
     local ok, err = pcall(function()
@@ -547,6 +709,21 @@ while controller.running do
         local camera = Workspace.CurrentCamera
         local viewport = camera.ViewportSize
         local centerX, centerY = viewport.X / 2, viewport.Y / 2
+        tintOverlay.Position, tintOverlay.Size, tintOverlay.Color = V2(0, 0), viewport, accents[cfg.accent]
+        tintOverlay.Filled, tintOverlay.Transparency, tintOverlay.Visible = true, cfg.tintStrength / 100, cfg.screenTint
+        pcall(function() tintOverlay.ZIndex = -10 end)
+        local gap, arm = 4, cfg.crosshairSize
+        local crosshairSegments = {
+            {centerX - gap - arm, centerY, centerX - gap, centerY},
+            {centerX + gap, centerY, centerX + gap + arm, centerY},
+            {centerX, centerY - gap - arm, centerX, centerY - gap},
+            {centerX, centerY + gap, centerX, centerY + gap + arm}
+        }
+        for i = 1, 4 do
+            local o, s = crosshairLines[i], crosshairSegments[i]
+            o.From, o.To, o.Color, o.Thickness = V2(s[1], s[2]), V2(s[3], s[4]), accents[cfg.accent], 2
+            o.Visible = cfg.crosshair
+        end
         fovCircle.Position, fovCircle.Radius, fovCircle.Color = V2(centerX, centerY), cfg.aimFov, accents[cfg.accent]
         fovCircle.Visible = cfg.aim and cfg.showFov
 
@@ -554,8 +731,10 @@ while controller.running do
         hideWorld()
         local myChar = LocalPlayer.Character
         local myRoot = myChar and (myChar:FindFirstChild("HumanoidRootPart") or myChar.PrimaryPart)
-        pcall(function() camera.FieldOfView = cfg.cameraFov end)
+        local currentFov = cfg.zoom and iskeypressed(0x5A) and not cfg.menu and cfg.zoomFov or cfg.cameraFov
+        pcall(function() camera.FieldOfView = currentFov end)
         if not myRoot then return end
+        updateCameraMode(camera, myRoot)
         if cfg.world and tick() >= nextWorldScan then
             nextWorldScan = tick() + 2.5
             pcall(scanWorld, myRoot)
@@ -572,7 +751,7 @@ while controller.running do
                     if not espDrawings[count] then espDrawings[count] = newEspEntry() end
                     drawEsp(espDrawings[count], t, viewport)
                 end
-                if cfg.aim then
+                if cfg.aim or cfg.triggerClick then
                     local dx, dy = t.aim.X - centerX, t.aim.Y - centerY
                     local score = math.sqrt(dx*dx + dy*dy)
                     if score < bestScore then best, bestScore = t, score end
@@ -584,6 +763,12 @@ while controller.running do
             local dy = clamp((best.aim.Y - centerY) / cfg.smooth, -30, 30)
             mousemoverel(round(dx), round(dy))
         end
+        local targetClick = cfg.triggerClick and best and best.distance <= cfg.hitRange and bestScore <= 24 and ismouse2pressed()
+        local rapidClick = cfg.fastClick and iskeypressed(0x56)
+        if (targetClick or rapidClick) and isrbxactive() and not cfg.menu and tick() >= nextHitTime then
+            nextHitTime = tick() + cfg.hitInterval / 1000
+            pcall(mouse1click)
+        end
     end)
     if not ok and tick() > nextWarn then
         warn("FALLEN / RIFT loop: " .. tostring(err))
@@ -594,6 +779,7 @@ end
 
 restoreCollisions()
 pcall(function() Workspace.CurrentCamera.FieldOfView = initialFov end)
+if cameraFrameBefore then pcall(function() Workspace.CurrentCamera.CFrame = cameraFrameBefore end) end
 for _, o in ipairs(allDrawings) do pcall(function() o:Remove() end) end
 if _G.FallenRift == controller then _G.FallenRift = nil end
 notify("RIFT unloaded.", "FALLEN / RIFT", 2)

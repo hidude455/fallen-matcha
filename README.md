@@ -28,8 +28,12 @@ Matcha's [classes documentation](https://docs.matchascripts.com/classes) lists `
 - Player ESP shows boxes, labels, range, health, and optional snaplines.
 - Optional aim assist moves the mouse toward the nearest on-screen player inside the FOV circle while right mouse is held and the menu is closed.
 - World ESP scans names for nodes, barrels, crates, and plants. **Alt + left click** a visible world marker with the menu hidden to select its object; the selected object gets a projected outline with a soft glow. Matching names can miss objects or include unrelated objects until exact Explorer paths are available.
+- World → Extra adds projected item outlines, a center crosshair, crosshair sizing, and world range. These are screen-space drawings, not material changes to the game world.
+- Combat adds **Target click** (right mouse held, visible target within 24 screen pixels of the crosshair and within the selected distance) and **Fast click** (hold **V**). Both send ordinary left clicks at the selected interval; hits depend on the equipped tool and Fallen's rules. They do not invoke game damage or tool remotes.
+- Camera → View adds base FOV, **Z**-hold zoom, and an accent-color screen tint. The tint affects the whole screen; Matcha's documented wrappers do not provide a true Sky replacement.
+- Camera → Modes adds optional third person and freecam. Freecam uses **WASD** to move, **Q/E** to descend/ascend, arrow keys to look, and **Left Shift** to boost speed. These modes use `Camera.CFrame`; the script turns a mode off and notifies you if this Matcha build cannot write it. They still need an in-game check.
 - Misc includes opt-in local noclip and wall climb. Noclip writes `CanCollide = false` on the local character and restores each original value when switched off or unloaded. Spider climb raises the local root's velocity while holding W against a raycast wall. These movement features depend on Matcha property writes and Fallen's server behavior; they have not been verified in-game.
-- Camera FOV and world range sliders are in Misc. Camera FOV is restored on unload.
+- Accent color and tint strength are in Misc. Camera FOV is restored on unload.
 
 The script uses Matcha's `Drawing`, `WorldToScreen`, `Players`, `Workspace:Raycast`, and input APIs. The main script does not use `Instance.new`, direct memory writes, or game remotes. The optional one-line loader above fetches that same source file over HTTP. Matcha does not expose a mesh silhouette API here, so the selected-object outline is a projected convex hull of its visible parts. It cannot be verified as undetected; game moderation and Matcha behavior can change.
 

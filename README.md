@@ -24,7 +24,7 @@ Matcha's [classes documentation](https://docs.matchascripts.com/classes) lists `
 
 ## Controls and features
 
-- **Right Shift** opens or hides the compact menu. Left Shift does nothing.
+- **Right Shift** opens or hides the menu. Left Shift does nothing.
 - Drag the **FALLEN / RIFT** header to move the menu. Click **X** at the top right to hide it; Right Shift opens it again.
 - **End** unloads the script and removes its Drawing objects.
 - Player ESP shows boxes, labels, range, health, and optional snaplines.
@@ -39,6 +39,6 @@ Matcha's [classes documentation](https://docs.matchascripts.com/classes) lists `
 
 The script uses Matcha's `Drawing`, `WorldToScreen`, `Players`, `Workspace:Raycast`, and input APIs. The main script does not use `Instance.new`, direct memory writes, or game remotes. The optional one-line loader above fetches that same source file over HTTP. Matcha does not expose a mesh silhouette API here, so the selected-object outline is a projected convex hull of its visible parts. It cannot be verified as undetected; game moderation and Matcha behavior can change.
 
-The menu follows the screenshot you supplied: narrow sidebar, top tabs, dark panel, and violet active state. `menu-preview.html` is a browser mockup of that design; the Lua file builds the real Matcha Drawing menu.
+The menu follows the screenshot you supplied: sidebar, top tabs, dark panel, and violet active state. Version 0.5 enlarges the window and text, sharpens text positions to whole pixels, raises contrast, highlights hovered controls, and lets sliders stay active while dragging outside their tracks. The menu scales down to fit smaller viewports. `menu-preview.html` is a browser mockup of the design; the Lua file builds the real Matcha Drawing menu.
 
 API references: [Matcha UI and scripting](https://docs.matchascripts.com/writing-scripts), [Drawing](https://docs.matchascripts.com/docs/drawing), [classes](https://docs.matchascripts.com/classes), [input](https://docs.matchascripts.com/docs/console).

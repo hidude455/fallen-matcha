@@ -1,5 +1,115 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fallen / RIFT menu preview</title><style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#101018;color:#f3f1f9;font:12px Arial,sans-serif;display:grid;place-items:center;overflow:hidden}.scene{position:fixed;inset:0;background:radial-gradient(ellipse at 55% 20%,#8e8893 0,#484450 28%,transparent 55%),linear-gradient(160deg,#252b32 35%,#31303b 37%,#1b1e22 57%,#131513 60%);filter:blur(7px) brightness(.48);transform:scale(1.05)}.scene:before{content:"";position:absolute;inset:30% -10% 0;background:linear-gradient(155deg,transparent 20%,#353836 21%,#1d211f 55%,#131513 56%)}.menu{position:relative;width:590px;height:440px;border-radius:7px;background:rgba(21,22,29,.94);box-shadow:0 20px 70px #000a,0 0 0 1px #ffffff0d;display:grid;grid-template-columns:139px 1fr;overflow:hidden}.side{background:rgba(10,11,15,.9);border-right:1px solid #30303b;padding:20px 8px}.brand{margin:0 11px 27px;font:bold 19px Arial;letter-spacing:.08em;cursor:move;user-select:none;touch-action:none}.brand small{display:block;margin-top:4px;color:#8b4bf7;font:10px monospace;letter-spacing:.34em}.nav{display:grid;gap:2px}.nav button{border:0;background:transparent;color:#aaa8b8;text-align:left;height:34px;padding:0 13px;border-radius:5px;font:11px Arial;letter-spacing:.08em;cursor:pointer}.nav button.active{color:white;background:#8b4bf7;box-shadow:0 0 18px #8b4bf744}.nav button:hover:not(.active){background:#272631}.keys{position:absolute;bottom:16px;left:19px;color:#696976;font:9px/18px monospace}.main{min-width:0}.tabs{height:52px;border-bottom:1px solid #30303b;padding:12px 55px 12px 18px;display:flex;gap:2px}.close{position:absolute;right:10px;top:13px;width:30px;height:27px;border:0;border-radius:5px;background:#20212c;color:#f48794;cursor:pointer;font:bold 11px Arial}.menu[hidden]{display:none}.drag-hint{display:block;margin-top:6px;color:#696976;font:9px monospace;letter-spacing:0}.tabs button{border:0;background:transparent;color:#888898;border-radius:15px;padding:0 7px;font:9px Arial;cursor:pointer}.tabs button.active{color:white;background:#8b4bf7}.content{padding:16px 22px}.content h1{font-size:17px;letter-spacing:.07em;margin:0 0 5px}.content p{color:#9393a5;margin:0 0 14px;font-size:10px}.rule{border-bottom:1px solid #363541;margin-bottom:15px}.row{background:#20212c;border-radius:7px;min-height:51px;margin:0 0 7px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between}.row b{display:block;font-size:12px}.row small{display:block;color:#9696a8;font-size:10px;margin-top:4px}.toggle{appearance:none;width:35px;height:20px;background:#4b4a57;border-radius:15px;position:relative;cursor:pointer}.toggle:after{content:"";position:absolute;width:14px;height:14px;border-radius:50%;top:3px;left:3px;background:#fff;transition:.15s}.toggle:checked{background:#8b4bf7}.toggle:checked:after{left:18px}.slider{width:120px;accent-color:#8b4bf7}.foot{position:absolute;right:20px;bottom:15px;color:#747484;font:9px monospace;letter-spacing:.1em}.badge{color:#9f76ff;font:bold 10px monospace;margin-top:16px}@media(max-width:650px){body{overflow:auto;padding:12px}.menu{width:min(100%,590px);height:440px;grid-template-columns:110px 1fr}.tabs{gap:2px;padding-left:5px}.tabs button{padding:0 8px}.side{padding-left:2px}.brand{font-size:16px}.nav button{font-size:9px}}
-</style></head><body><div class="scene"></div><div class="menu"><button class="close" aria-label="Close menu">X</button><aside class="side"><div class="brand">FALLEN<small>RIFT</small><span class="drag-hint">DRAG TO MOVE</span></div><nav class="nav"><button data-tab="0">OVERVIEW</button><button data-tab="1">AIMBOT</button><button data-tab="2" class="active">VISUALS</button><button data-tab="3">WORLD</button><button data-tab="4">COMBAT</button><button data-tab="5">CAMERA</button><button data-tab="6">MISC</button></nav><div class="keys">ALT+CLICK SELECT<br>RSHIFT&nbsp; HIDE<br>END&nbsp;&nbsp;&nbsp;&nbsp; UNLOAD</div></aside><main class="main"><div class="tabs"><button data-tab="0">Home</button><button data-tab="1">Aim</button><button data-tab="2" class="active">ESP</button><button data-tab="3">Loot</button><button data-tab="4">Fight</button><button data-tab="5">Camera</button><button data-tab="6">Misc</button></div><div class="content"><h1 id="title">VISUALS</h1><p>Fallen Survival / external control</p><div class="rule"></div><div id="rows"></div></div></main></div><script>
-const tabs=[{title:'OVERVIEW',rows:[['Fallen Survival','Matcha external visual console',null],['Player ESP','Boxes, names, distance and health',true],['Aim assist','Hold right mouse near a target',false]]},{title:'AIMBOT',rows:[['Aim assist','Hold right mouse to engage',false],['Show FOV','Display target selection radius',true],['FOV radius','Screen pixels around crosshair','range'],['Smoothing','Higher is slower','range']]},{title:'VISUALS',rows:[['Player ESP','Master visual toggle',true],['Boxes','Outline player silhouettes',true],['Names + distance','Identify and range targets',true],['Health bars','Show available health value',true],['Snaplines','Lines from lower screen edge',false]]},{title:'WORLD',rows:[['World ESP','Master resource overlay',true],['Nodes','Ore, stone, sulfur and wood',true],['Barrels + crates','Loot containers',true],['Plants','Hemp, berries and crops',true],['Item outlines','Screen-space outlines around resources',false]]},{title:'COMBAT',rows:[['Target click','Right mouse + target near crosshair',false],['Fast click','Hold V to repeat left click',false],['Target range','Maximum target distance','range'],['Click interval','Milliseconds between clicks','range']]},{title:'CAMERA',rows:[['Camera FOV','Base field of view','range'],['Hold zoom','Hold Z while menu is closed',false],['Zoom FOV','Field of view while holding Z','range'],['Screen tint','Transparent accent-color overlay',false],['Tint strength','Overlay opacity percent','range']]},{title:'MISC',rows:[['Show teammates','Include same-team players',false],['Noclip','Local character collision',false],['Spider climb','Hold W into a wall to rise',false],['Accent color','Menu, reticle and screen tint',null]]}];let current=2;function render(){document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',+b.dataset.tab===current));document.querySelector('#title').textContent=tabs[current].title;document.querySelector('#rows').innerHTML=tabs[current].rows.map(([a,b,v])=>`<div class="row"><div><b>${a}</b><small>${b}</small></div>${v===null?'':v==='range'?'<input class="slider" type="range">':`<input class="toggle" type="checkbox" ${v?'checked':''}>`}</div>`).join('')}document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{current=+b.dataset.tab;render()});render();const menu=document.querySelector('.menu'),brand=document.querySelector('.brand');let drag=null;brand.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,left:parseFloat(menu.style.left)||0,top:parseFloat(menu.style.top)||0};brand.setPointerCapture(e.pointerId)});brand.addEventListener('pointermove',e=>{if(!drag)return;const baseX=(innerWidth-menu.offsetWidth)/2,baseY=(innerHeight-menu.offsetHeight)/2;menu.style.left=Math.max(-baseX,Math.min(innerWidth-menu.offsetWidth-baseX,drag.left+e.clientX-drag.x))+'px';menu.style.top=Math.max(-baseY,Math.min(innerHeight-menu.offsetHeight-baseY,drag.top+e.clientY-drag.y))+'px'});brand.addEventListener('pointerup',()=>drag=null);brand.addEventListener('pointercancel',()=>drag=null);document.querySelector('.close').onclick=()=>menu.hidden=true;window.addEventListener('keydown',e=>{if(e.code==='ShiftRight')menu.hidden=!menu.hidden});
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fallen / RIFT menu preview</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;overflow:hidden;background:#0e0f16;color:#f5f3fa;font:13px/1.4 Arial,sans-serif}
+    .scene{position:fixed;inset:-20px;background:radial-gradient(circle at 60% 18%,#5c5274 0,#2b2b3e 30%,transparent 59%),linear-gradient(155deg,#252a2d 0,#17191f 56%,#0d1013 100%);filter:blur(10px) brightness(.55)}
+    .menu{position:relative;display:grid;grid-template-columns:170px 1fr;width:720px;height:530px;overflow:hidden;background:#181a26;border:1px solid #454055;border-top:3px solid #8d57fa;border-radius:13px;box-shadow:0 26px 90px #000b,0 0 35px #8d57fa26}
+    .side{position:relative;background:#11131e;border-right:1px solid #343447;padding:19px 12px}
+    .brand{height:91px;padding:0 10px;cursor:move;user-select:none;touch-action:none}
+    .brand strong{display:block;font-size:23px;letter-spacing:.1em;line-height:1}
+    .brand small{display:block;margin-top:8px;color:#ae82ff;font:bold 12px monospace;letter-spacing:.38em}
+    .brand em{display:block;margin-top:7px;color:#85859b;font:10px monospace;font-style:normal;letter-spacing:.06em}
+    .nav{display:grid;gap:4px}
+    .nav button{height:42px;display:flex;align-items:center;gap:10px;width:100%;padding:0 10px;border:0;border-radius:7px;background:transparent;color:#a9a8bf;font:bold 12px Arial;text-align:left;letter-spacing:.05em;cursor:pointer}
+    .nav button:hover{background:#242538;color:#f7f5ff}
+    .nav button.active{background:#6339b6;color:white;box-shadow:inset 3px 0 #b58cff,0 3px 18px #7c46de44}
+    .nav .glyph{display:grid;place-items:center;width:23px;height:23px;border:1px solid #49435e;border-radius:6px;color:#b9a1e8;font:9px monospace;letter-spacing:0}
+    .nav button.active .glyph{border-color:#c7a9ff;color:white}
+    .sidefoot{position:absolute;left:22px;bottom:18px;color:#aaa9bd;font:10px/19px monospace}
+    .sidefoot b{color:#d9c3ff;font-weight:normal}
+    .main{min-width:0}
+    .top{height:60px;display:flex;align-items:center;gap:4px;padding:10px 52px 10px 14px;border-bottom:1px solid #343447;background:#1b1d2a}
+    .top button{height:34px;min-width:58px;padding:0 10px;border:0;border-radius:16px;background:transparent;color:#a9a8bf;font:bold 11px Arial;cursor:pointer}
+    .top button:hover{background:#2b2b3c;color:white}
+    .top button.active{background:#7442dd;color:white;box-shadow:0 0 17px #9b60ff66}
+    .close{position:absolute;right:14px;top:14px;width:32px;height:32px;border:1px solid #4b4058;border-radius:8px;background:#292536;color:#f59aaa;font:bold 15px Arial;cursor:pointer}
+    .close:hover{background:#733e59;color:white}
+    .content{padding:18px 23px 0}
+    .heading{position:relative;height:82px;border-bottom:1px solid #3b3b50}
+    .eyebrow{color:#a778ff;font:bold 10px monospace;letter-spacing:.15em}
+    h1{margin:3px 0 1px;font-size:22px;letter-spacing:.05em}
+    .subtitle{margin:0;color:#b6b5c9;font-size:12px}
+    .pages{position:absolute;right:0;bottom:12px;display:flex;gap:5px}
+    .pages button{height:27px;padding:0 11px;border:1px solid #4b405e;border-radius:7px;background:#272738;color:#bdb5d2;font:bold 10px Arial;cursor:pointer}
+    .pages button.active{border-color:#9465eb;background:#7040cb;color:white}
+    .rows{padding-top:16px}
+    .row{position:relative;min-height:63px;margin-bottom:7px;padding:11px 14px;background:#252838;border:1px solid #393b4f;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+    .row:hover{background:#2b2e40;border-color:#5d4f7a}
+    .row.on:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:#a778ff}
+    .row strong{display:block;color:#f1eff9;font-size:14px}
+    .row small{display:block;margin-top:3px;color:#b4b4c8;font-size:11px}
+    .toggle{appearance:none;flex:none;width:42px;height:24px;margin:0;background:#505164;border-radius:14px;cursor:pointer;position:relative}
+    .toggle:after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;background:#f4f3f7;border-radius:50%;transition:.12s}
+    .toggle:checked{background:#8d57fa}
+    .toggle:checked:after{left:21px}
+    .slider{width:175px;accent-color:#a778ff;cursor:pointer}
+    .choice{padding:6px 10px;border:1px solid #7758a7;border-radius:6px;background:#343047;color:#d3baff;font:bold 11px Arial}
+    .hero{height:88px;background:linear-gradient(100deg,#35294e,#272838);border-color:#695093}
+    .hero strong{font-size:17px}
+    .hero .choice{background:#4d337d;color:#f7efff}
+    .note{margin:12px 0;color:#aaa9c0;font:11px monospace}
+    .menu[hidden]{display:none}
+    @media(max-width:740px){body{overflow:auto;padding:8px}.menu{width:min(720px,100%)}.top{gap:0;padding-left:4px}.top button{min-width:0;padding:0 6px;font-size:9px}}
+  </style>
+</head>
+<body>
+  <div class="scene"></div>
+  <div class="menu" id="menu">
+    <aside class="side">
+      <div class="brand" id="drag"><strong>FALLEN</strong><small>RIFT</small><em>DRAG TO MOVE</em></div>
+      <nav class="nav" id="nav"></nav>
+      <div class="sidefoot"><b>RSHIFT</b>  HIDE / OPEN<br><b>END</b>     UNLOAD</div>
+    </aside>
+    <main class="main">
+      <div class="top" id="top"></div>
+      <button class="close" id="close" aria-label="Close menu">×</button>
+      <div class="content">
+        <div class="heading"><div class="eyebrow">FALLEN SURVIVAL / MATCHA VM</div><h1 id="title"></h1><p class="subtitle" id="subtitle"></p><div class="pages" id="pages"></div></div>
+        <div class="rows" id="rows"></div>
+        <div class="note" id="note"></div>
+      </div>
+    </main>
+  </div>
+  <script>
+    const tabs=[
+      {name:'OVERVIEW',short:'Home',glyph:'01',subtitle:'Your session at a glance',rows:[['FALLEN SURVIVAL','Player visuals and quick controls','READY'],['Player ESP','Boxes, labels, range, and health',true],['Aim assist','Hold right mouse near a target',false]]},
+      {name:'AIMBOT',short:'Aim',glyph:'02',subtitle:'Aim assistance and target area',rows:[['Aim assist','Hold right mouse to engage',false],['Show FOV','Display target selection radius',true],['FOV radius','Screen pixels around crosshair','range'],['Smoothing','Higher is slower','range']]},
+      {name:'VISUALS',short:'ESP',glyph:'03',subtitle:'Player overlays and health',rows:[['Player ESP','Master visual toggle',true],['Boxes','Outline player silhouettes',true],['Names + distance','Identify and range targets',true],['Health bars','Show available health value',true],['Snaplines','Lines from the lower screen edge',false]]},
+      {name:'WORLD',short:'Loot',glyph:'04',subtitle:'Resources and world objects',pages:{ESP:[['World ESP','Master resource overlay',true],['Nodes','Ore, stone, sulfur and wood',true],['Barrels + crates','Loot containers',true],['Plants','Hemp, berries and crops',true],['Selected glow','Alt + click a marker to focus it',true]],EXTRA:[['Item outlines','Screen-space outlines around resources',false],['Crosshair','Center reticle drawn by Matcha',false],['Crosshair size','Reticle arm length in pixels','range'],['World range','Maximum resource distance','range']]}},
+      {name:'COMBAT',short:'Fight',glyph:'05',subtitle:'Input controls for equipped tools',rows:[['Target click','Right mouse + target near crosshair',false],['Fast click','Hold V to repeat left click',false],['Target range','Maximum target distance','range'],['Click interval','Milliseconds between clicks','range']]},
+      {name:'CAMERA',short:'Camera',glyph:'06',subtitle:'View and camera controls',pages:{VIEW:[['Camera FOV','Base field of view','range'],['Hold zoom','Hold Z while menu is closed',false],['Zoom FOV','Field of view while holding Z','range'],['Screen tint','Transparent accent-color overlay',false]],MODES:[['Third person (beta)','Camera pulled behind your character',false],['View distance','Camera distance behind character','range'],['Freecam (beta)','WASD / Q E / arrow keys',false],['Freecam speed','Left Shift boosts movement','range']]}},
+      {name:'MISC',short:'Misc',glyph:'07',subtitle:'Session and appearance settings',rows:[['Show teammates','Include same-team players',false],['Noclip','Local character collision',false],['Spider climb','Hold W into a wall to rise',false],['Accent color','Menu, reticle and screen tint','VIOLET'],['Tint strength','Overlay opacity percent','range']]}
+    ];
+    let current=2; const subpage={3:'ESP',5:'VIEW'};
+    const menu=document.querySelector('#menu');
+    function render(){
+      const tab=tabs[current];
+      document.querySelector('#nav').innerHTML=tabs.map((t,i)=>`<button class="${i===current?'active':''}" data-tab="${i}"><span class="glyph">${t.glyph}</span>${t.name}</button>`).join('');
+      document.querySelector('#top').innerHTML=tabs.map((t,i)=>`<button class="${i===current?'active':''}" data-tab="${i}">${t.short}</button>`).join('');
+      document.querySelector('#title').textContent=tab.name;
+      document.querySelector('#subtitle').textContent=tab.subtitle;
+      const pageKeys=tab.pages?Object.keys(tab.pages):[];
+      document.querySelector('#pages').innerHTML=pageKeys.map(k=>`<button class="${subpage[current]===k?'active':''}" data-page="${k}">${k}</button>`).join('');
+      const rows=tab.pages?tab.pages[subpage[current]]:tab.rows;
+      document.querySelector('#rows').innerHTML=rows.map(([title,hint,value])=>`<div class="row ${value===true?'on':''} ${value==='READY'?'hero':''}"><div><strong>${title}</strong><small>${hint}</small></div>${typeof value==='boolean'?`<input class="toggle" type="checkbox" ${value?'checked':''}>`:value==='range'?'<input class="slider" type="range">':`<span class="choice">${value}</span>`}</div>`).join('');
+      document.querySelector('#note').textContent=current===4?'Clicks depend on the equipped tool and Fallen server rules.':current===5?'Beta camera modes disable themselves if Matcha rejects the camera write.':'';
+      document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{current=+b.dataset.tab;render()});
+      document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{subpage[current]=b.dataset.page;render()});
+      document.querySelectorAll('.toggle').forEach(b=>b.onchange=()=>b.closest('.row').classList.toggle('on',b.checked));
+    }
+    render();
+    document.querySelector('#close').onclick=()=>menu.hidden=true;
+    window.addEventListener('keydown',e=>{if(e.code==='ShiftRight')menu.hidden=!menu.hidden});
+    const dragHandle=document.querySelector('#drag');let drag=null;
+    dragHandle.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,left:parseFloat(menu.style.left)||0,top:parseFloat(menu.style.top)||0};dragHandle.setPointerCapture(e.pointerId)});
+    dragHandle.addEventListener('pointermove',e=>{if(!drag)return;const baseX=(innerWidth-menu.offsetWidth)/2,baseY=(innerHeight-menu.offsetHeight)/2;menu.style.left=Math.max(-baseX,Math.min(innerWidth-menu.offsetWidth-baseX,drag.left+e.clientX-drag.x))+'px';menu.style.top=Math.max(-baseY,Math.min(innerHeight-menu.offsetHeight-baseY,drag.top+e.clientY-drag.y))+'px'});
+    dragHandle.addEventListener('pointerup',()=>drag=null);
+    dragHandle.addEventListener('pointercancel',()=>drag=null);
+  </script>
+</body>
+</html>

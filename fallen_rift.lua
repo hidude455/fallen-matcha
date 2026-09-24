@@ -1,11 +1,30 @@
 -- FALLEN / RIFT | Matcha external Lua VM
--- Place: Fallen Survival (10228136016)
+-- Fallen Survival: root place 10228136016, universe 3747388906
 -- Right Shift: show/hide menu  |  End: unload  |  Right mouse: hold aim assist
 
-local PLACE_ID = 10228136016
-local VERSION = "0.3"
-if game.PlaceId ~= PLACE_ID then
-    notify("Open Fallen Survival before running this script.", "FALLEN / RIFT", 4)
+local ROOT_PLACE_ID = 10228136016
+local UNIVERSE_ID = 3747388906
+local SERVER_PLACES = {
+    [13800717766] = true, -- Large Server
+    [15479377118] = true, -- Small Server
+    [16849012343] = true  -- Medium Server
+}
+local VERSION = "0.4"
+local currentPlaceId = tonumber(game.PlaceId) or 0
+local function readUniverseId()
+    local ok, id = pcall(function() return tonumber(game.GameId) or 0 end)
+    return ok and id or 0
+end
+local currentUniverseId = readUniverseId()
+if currentPlaceId ~= ROOT_PLACE_ID and not SERVER_PLACES[currentPlaceId] and currentUniverseId == 0 then
+    local deadline = tick() + 5
+    while currentUniverseId == 0 and tick() < deadline do
+        wait(0.2)
+        currentUniverseId = readUniverseId()
+    end
+end
+if currentPlaceId ~= ROOT_PLACE_ID and not SERVER_PLACES[currentPlaceId] and currentUniverseId ~= UNIVERSE_ID then
+    notify("Fallen not detected. Place " .. tostring(currentPlaceId) .. ", game " .. tostring(currentUniverseId), "FALLEN / RIFT", 7)
     return
 end
 
@@ -20,6 +39,8 @@ _G.FallenRift = controller
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
+while not LocalPlayer do wait(0.1); LocalPlayer = Players.LocalPlayer end
+while not Workspace.CurrentCamera do wait(0.1) end
 local Mouse = LocalPlayer:GetMouse()
 local V2 = Vector2.new
 local V3 = Vector3.new

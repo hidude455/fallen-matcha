@@ -2,6 +2,8 @@
 
 Matcha Lua script for [Fallen Survival](https://www.roblox.com/games/10228136016/Fallen-Survival).
 
+The loader accepts Fallen's experience ID (`3747388906`) across its lobby and server places. It also recognizes the currently listed Large (`13800717766`), Small (`15479377118`), and Medium (`16849012343`) server places if Matcha cannot read `game.GameId`. If you see a “Fallen not detected” notice, it prints the place and game IDs needed to update this check.
+
 ## Run it
 
 Open `fallen_rift.lua` and paste the complete file into Matcha while in the game, or use this one-line loader for the public GitHub copy:

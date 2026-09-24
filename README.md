@@ -4,13 +4,13 @@ Matcha Lua script for [Fallen Survival](https://www.roblox.com/games/10228136016
 
 ## Run it
 
-For now, open `fallen_rift.lua` and paste the complete file into Matcha while in the game. The script is self-contained, so it can also be hosted as one raw GitHub file. Publish the contents of this `fallen-matcha` folder at the root of your own public repository. Replace `YOUR_USER` and `YOUR_REPO` below with its actual owner and name, then paste this single line into Matcha:
+Open `fallen_rift.lua` and paste the complete file into Matcha while in the game, or use this one-line loader for the public GitHub copy:
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/fallen_rift.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/hidude455/fallen-matcha/main/fallen_rift.lua"))()
 ```
 
-The path assumes your default branch is named `main`. Use the raw file URL, not a `github.com/.../blob/...` page. The sample `ata-777` URL is only an example; this project is not hosted there.
+Use the raw file URL, not a `github.com/.../blob/...` page. The sample `ata-777` URL was only an example; this project is hosted in `hidude455/fallen-matcha`.
 
 Matcha's [classes documentation](https://docs.matchascripts.com/classes) lists `game:HttpGet(url)`; its [HTTP documentation](https://docs.matchascripts.com/docs/http) also lists the equivalent global `httpget(url)`. Its [scripting guide](https://docs.matchascripts.com/writing-scripts) says scripts run inside Matcha's Lua VM. The remote loader needs network access and a publicly readable raw URL. I have syntax-checked the Lua source but have not run it in Matcha or Fallen.
 

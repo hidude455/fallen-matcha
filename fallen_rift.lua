@@ -9,7 +9,7 @@ local SERVER_PLACES = {
     [15479377118] = true, -- Small Server
     [16849012343] = true  -- Medium Server
 }
-local VERSION = "0.5"
+local VERSION = "0.6"
 local currentPlaceId = tonumber(game.PlaceId) or 0
 local function readUniverseId()
     local ok, id = pcall(function() return tonumber(game.GameId) or 0 end)
@@ -92,7 +92,7 @@ local function rect(x, y, w, h, color, corner)
     local o = pooled("Square")
     o.Position, o.Size, o.Color = V2(pixel(uiOriginX + x * uiScale), pixel(uiOriginY + y * uiScale)), V2(pixel(w * uiScale), pixel(h * uiScale)), color
     o.Filled, o.Transparency, o.Visible = true, 1, true
-    pcall(function() o.Corner = (corner or 0) * uiScale end)
+    pcall(function() o.Corner = pixel((corner or 0) * uiScale) end)
     pcall(function() o.ZIndex = 10 end)
     return o
 end
@@ -134,8 +134,7 @@ local function round(n) return n >= 0 and math.floor(n + 0.5) or math.ceil(n - 0
 local activeSlider = nil
 local function menuRow(x, y, w, title, hint, on, mx, my, click)
     local hot = pointIn(mx, my, x, y, w, 53)
-    rect(x, y, w, 53, hot and theme.hover or theme.raised, 7)
-    if on then rect(x, y + 8, 3, 37, accents[cfg.accent], 2) end
+    rect(x, y, w, 53, hot and theme.hover or theme.raised, 10)
     label(x + 15, y + 6, title, theme.text, 14, true)
     label(x + 15, y + 28, hint, theme.muted, 11)
     rect(x + w - 59, y + 14, 43, 25, on and accents[cfg.accent] or theme.line, 12)
@@ -144,7 +143,7 @@ local function menuRow(x, y, w, title, hint, on, mx, my, click)
 end
 local function choiceRow(x, y, w, title, hint, value, mx, my, click)
     local hot = pointIn(mx, my, x, y, w, 53)
-    rect(x, y, w, 53, hot and theme.hover or theme.raised, 7)
+    rect(x, y, w, 53, hot and theme.hover or theme.raised, 10)
     label(x + 15, y + 6, title, theme.text, 14, true)
     label(x + 15, y + 28, hint, theme.muted, 11)
     rect(x + w - 102, y + 12, 86, 29, theme.line, 7)
@@ -158,7 +157,7 @@ local function sliderRow(x, y, w, title, hint, value, minValue, maxValue, mx, my
         activeSlider = title
         value = round(clamp(minValue + (mx - x - 16) / (w - 32) * (maxValue - minValue), minValue, maxValue))
     end
-    rect(x, y, w, 66, hot and theme.hover or theme.raised, 7)
+    rect(x, y, w, 66, hot and theme.hover or theme.raised, 10)
     label(x + 15, y + 6, title, theme.text, 14, true)
     label(x + 15, y + 28, hint, theme.muted, 11)
     label(x + w - 52, y + 6, tostring(value), accents[cfg.accent], 13, true)
@@ -206,12 +205,12 @@ local function drawMenu(mx, my, click, held)
     uiOriginX, uiOriginY = x, y
     mx, my = (mx - x) / uiScale, (my - y) / uiScale
     x, y = 0, 0
-    rect(x + 6, y + 7, 590, 440, theme.bg, 9)
-    local base = rect(x, y, 590, 440, theme.panel, 8)
-    base.Transparency = 1
-    rect(x, y, 590, 3, accents[cfg.accent], 2)
-    local side = rect(x, y, 139, 440, theme.bg, 7)
-    side.Transparency = 1
+    local shadow = rect(x + 5, y + 6, 590, 440, theme.bg, 14)
+    shadow.Transparency = 0.55
+    rect(x, y, 590, 440, theme.line, 14)
+    rect(x + 1, y + 1, 588, 438, theme.panel, 13)
+    rect(x + 1, y + 1, 34, 438, theme.bg, 13)
+    rect(x + 22, y + 1, 117, 438, theme.bg, 0)
     label(x + 19, y + 22, "FALLEN", theme.text, 19, true)
     label(x + 20, y + 49, "R I F T", accents[cfg.accent], 10, true)
     label(x + 20, y + 70, "DRAG TO MOVE", theme.muted, 9)
@@ -219,8 +218,8 @@ local function drawMenu(mx, my, click, held)
     local tabNames = { "OVERVIEW", "AIMBOT", "VISUALS", "WORLD", "COMBAT", "CAMERA", "MISC" }
     for i = 1, 7 do
         local ty = y + 91 + (i - 1) * 41
-        if i == cfg.tab then rect(x + 8, ty, 123, 36, accents[cfg.accent], 5)
-        elseif pointIn(mx, my, x + 8, ty, 123, 36) then rect(x + 8, ty, 123, 36, theme.hover, 5) end
+        if i == cfg.tab then rect(x + 8, ty, 123, 36, accents[cfg.accent], 8)
+        elseif pointIn(mx, my, x + 8, ty, 123, 36) then rect(x + 8, ty, 123, 36, theme.hover, 8) end
         label(x + 22, ty + 10, tabNames[i], i == cfg.tab and theme.white or theme.muted, 12, i == cfg.tab)
         if click and pointIn(mx, my, x + 8, ty, 123, 36) then cfg.tab = i end
     end
@@ -236,7 +235,7 @@ local function drawMenu(mx, my, click, held)
         label(tx + 5, y + 19, topNames[i], i == cfg.tab and theme.white or theme.muted, 10, i == cfg.tab)
         if click and pointIn(mx, my, tx, y + 13, 54, 27) then cfg.tab = i end
     end
-    rect(x + 550, y + 13, 30, 27, theme.raised, 5)
+    rect(x + 550, y + 13, 30, 27, theme.raised, 8)
     label(x + 560, y + 19, "X", theme.coral, 11, true)
     line(x + 140, y + 51, x + 589, y + 51, theme.line)
     local bx, by, bw = x + 161, y + 61, 405
@@ -245,7 +244,7 @@ local function drawMenu(mx, my, click, held)
     line(bx, by + 52, bx + bw, by + 52, theme.line)
     local rowY = by + 68
     if cfg.tab == 1 then
-        rect(bx, rowY, bw, 71, theme.raised, 7)
+        rect(bx, rowY, bw, 71, theme.raised, 10)
         label(bx + 14, rowY + 11, "FALLEN SURVIVAL", theme.text, 15, true)
         label(bx + 14, rowY + 37, "Player visuals + on-hold aim assist", theme.muted, 11)
         rect(bx + bw - 86, rowY + 17, 70, 19, theme.line, 9)

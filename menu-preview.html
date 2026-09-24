@@ -8,16 +8,16 @@
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;display:grid;place-items:center;overflow:hidden;background:#0e0f16;color:#f5f3fa;font:13px/1.4 Arial,sans-serif}
     .scene{position:fixed;inset:-20px;background:radial-gradient(circle at 60% 18%,#5c5274 0,#2b2b3e 30%,transparent 59%),linear-gradient(155deg,#252a2d 0,#17191f 56%,#0d1013 100%);filter:blur(10px) brightness(.55)}
-    .menu{position:relative;display:grid;grid-template-columns:170px 1fr;width:720px;height:530px;overflow:hidden;background:#181a26;border:1px solid #454055;border-top:3px solid #8d57fa;border-radius:13px;box-shadow:0 26px 90px #000b,0 0 35px #8d57fa26}
+    .menu{position:relative;display:grid;grid-template-columns:170px 1fr;width:720px;height:530px;overflow:hidden;background:#181a26;border:1px solid #454055;border-radius:17px;box-shadow:0 24px 70px #0009}
     .side{position:relative;background:#11131e;border-right:1px solid #343447;padding:19px 12px}
     .brand{height:91px;padding:0 10px;cursor:move;user-select:none;touch-action:none}
     .brand strong{display:block;font-size:23px;letter-spacing:.1em;line-height:1}
     .brand small{display:block;margin-top:8px;color:#ae82ff;font:bold 12px monospace;letter-spacing:.38em}
     .brand em{display:block;margin-top:7px;color:#85859b;font:10px monospace;font-style:normal;letter-spacing:.06em}
     .nav{display:grid;gap:4px}
-    .nav button{height:42px;display:flex;align-items:center;gap:10px;width:100%;padding:0 10px;border:0;border-radius:7px;background:transparent;color:#a9a8bf;font:bold 12px Arial;text-align:left;letter-spacing:.05em;cursor:pointer}
+    .nav button{height:42px;display:flex;align-items:center;gap:10px;width:100%;padding:0 10px;border:0;border-radius:10px;background:transparent;color:#a9a8bf;font:bold 12px Arial;text-align:left;letter-spacing:.05em;cursor:pointer}
     .nav button:hover{background:#242538;color:#f7f5ff}
-    .nav button.active{background:#6339b6;color:white;box-shadow:inset 3px 0 #b58cff,0 3px 18px #7c46de44}
+    .nav button.active{background:#6339b6;color:white;box-shadow:0 3px 14px #7c46de32}
     .nav .glyph{display:grid;place-items:center;width:23px;height:23px;border:1px solid #49435e;border-radius:6px;color:#b9a1e8;font:9px monospace;letter-spacing:0}
     .nav button.active .glyph{border-color:#c7a9ff;color:white}
     .sidefoot{position:absolute;left:22px;bottom:18px;color:#aaa9bd;font:10px/19px monospace}
@@ -27,7 +27,7 @@
     .top button{height:34px;min-width:58px;padding:0 10px;border:0;border-radius:16px;background:transparent;color:#a9a8bf;font:bold 11px Arial;cursor:pointer}
     .top button:hover{background:#2b2b3c;color:white}
     .top button.active{background:#7442dd;color:white;box-shadow:0 0 17px #9b60ff66}
-    .close{position:absolute;right:14px;top:14px;width:32px;height:32px;border:1px solid #4b4058;border-radius:8px;background:#292536;color:#f59aaa;font:bold 15px Arial;cursor:pointer}
+    .close{position:absolute;right:14px;top:14px;width:32px;height:32px;border:1px solid #4b4058;border-radius:10px;background:#292536;color:#f59aaa;font:bold 15px Arial;cursor:pointer}
     .close:hover{background:#733e59;color:white}
     .content{padding:18px 23px 0}
     .heading{position:relative;height:82px;border-bottom:1px solid #3b3b50}
@@ -38,9 +38,8 @@
     .pages button{height:27px;padding:0 11px;border:1px solid #4b405e;border-radius:7px;background:#272738;color:#bdb5d2;font:bold 10px Arial;cursor:pointer}
     .pages button.active{border-color:#9465eb;background:#7040cb;color:white}
     .rows{padding-top:16px}
-    .row{position:relative;min-height:63px;margin-bottom:7px;padding:11px 14px;background:#252838;border:1px solid #393b4f;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+    .row{position:relative;min-height:63px;margin-bottom:7px;padding:11px 14px;background:#252838;border:1px solid #393b4f;border-radius:11px;display:flex;justify-content:space-between;align-items:center}
     .row:hover{background:#2b2e40;border-color:#5d4f7a}
-    .row.on:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:#a778ff}
     .row strong{display:block;color:#f1eff9;font-size:14px}
     .row small{display:block;margin-top:3px;color:#b4b4c8;font-size:11px}
     .toggle{appearance:none;flex:none;width:42px;height:24px;margin:0;background:#505164;border-radius:14px;cursor:pointer;position:relative}

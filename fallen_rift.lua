@@ -9,7 +9,7 @@ local SERVER_PLACES = {
     [15479377118] = true, -- Small Server
     [16849012343] = true  -- Medium Server
 }
-local VERSION = "0.6"
+local VERSION = "0.7"
 local currentPlaceId = tonumber(game.PlaceId) or 0
 local function readUniverseId()
     local ok, id = pcall(function() return tonumber(game.GameId) or 0 end)
@@ -65,6 +65,7 @@ local cfg = {
     crosshair = false, crosshairSize = 7,
     noclip = false, spider = false, climbSpeed = 18,
     cameraFov = 70, zoom = false, zoomFov = 35, cameraPage = 1,
+    galaxySky = false, galaxyStrength = 70, galaxyDensity = 88,
     thirdPerson = false, thirdDistance = 8, freecam = false, freecamSpeed = 2,
     screenTint = false, tintStrength = 12,
     triggerClick = false, fastClick = false, hitRange = 25, hitInterval = 180
@@ -315,13 +316,14 @@ local function drawMenu(mx, my, click, held)
         rowY = rowY + 76
         label(bx, rowY, "Requires an equipped tool and game acceptance", theme.muted, 10)
     elseif cfg.tab == 6 then
-        local pageX = bx + bw - 112
-        rect(pageX, by + 25, 52, 23, cfg.cameraPage == 1 and accents[cfg.accent] or theme.raised, 5)
-        rect(pageX + 56, by + 25, 52, 23, cfg.cameraPage == 2 and accents[cfg.accent] or theme.raised, 5)
-        label(pageX + 10, by + 30, "VIEW", theme.white, 10, true)
-        label(pageX + 64, by + 30, "MODES", theme.white, 10, true)
-        if click and pointIn(mx, my, pageX, by + 25, 52, 23) then cfg.cameraPage = 1 end
-        if click and pointIn(mx, my, pageX + 56, by + 25, 52, 23) then cfg.cameraPage = 2 end
+        local pageX = bx + bw - 168
+        local cameraPages = { "VIEW", "MODES", "SKY" }
+        for i = 1, 3 do
+            local px = pageX + (i - 1) * 56
+            rect(px, by + 25, 52, 23, cfg.cameraPage == i and accents[cfg.accent] or theme.raised, 6)
+            label(px + (i == 2 and 7 or 11), by + 30, cameraPages[i], theme.white, 10, true)
+            if click and pointIn(mx, my, px, by + 25, 52, 23) then cfg.cameraPage = i end
+        end
         if cfg.cameraPage == 1 then
             cfg.cameraFov = sliderRow(bx, rowY, bw, "Camera FOV", "Base field of view", cfg.cameraFov, 55, 110, mx, my, held)
             rowY = rowY + 76
@@ -330,7 +332,7 @@ local function drawMenu(mx, my, click, held)
             cfg.zoomFov = sliderRow(bx, rowY, bw, "Zoom FOV", "Field of view while holding Z", cfg.zoomFov, 15, 65, mx, my, held)
             rowY = rowY + 76
             if menuRow(bx, rowY, bw, "Screen tint", "Transparent accent-color overlay", cfg.screenTint, mx, my, click) then cfg.screenTint = not cfg.screenTint end
-        else
+        elseif cfg.cameraPage == 2 then
             if menuRow(bx, rowY, bw, "Third person (beta)", "Camera pulled behind your character", cfg.thirdPerson, mx, my, click) then
                 cfg.thirdPerson = not cfg.thirdPerson
                 if cfg.thirdPerson then cfg.freecam = false end
@@ -344,6 +346,15 @@ local function drawMenu(mx, my, click, held)
             end
             rowY = rowY + 64
             cfg.freecamSpeed = sliderRow(bx, rowY, bw, "Freecam speed", "Units per frame; Left Shift boosts", cfg.freecamSpeed, 1, 8, mx, my, held)
+        else
+            if menuRow(bx, rowY, bw, "Galaxy starfield", "Stars projected above the horizon", cfg.galaxySky, mx, my, click) then cfg.galaxySky = not cfg.galaxySky end
+            rowY = rowY + 67
+            cfg.galaxyStrength = sliderRow(bx, rowY, bw, "Star brightness", "Opacity of the star overlay", cfg.galaxyStrength, 25, 100, mx, my, held)
+            rowY = rowY + 76
+            cfg.galaxyDensity = sliderRow(bx, rowY, bw, "Star density", "Number of visible stars", cfg.galaxyDensity, 20, 96, mx, my, held)
+            rowY = rowY + 82
+            label(bx, rowY, "SCREEN-SPACE EFFECT", accents[cfg.accent], 10, true)
+            label(bx, rowY + 22, "Scenery can remain visible behind the stars", theme.muted, 11)
         end
     else
         if menuRow(bx, rowY, bw, "Show teammates", "Include same-team players", cfg.teammates, mx, my, click) then cfg.teammates = not cfg.teammates end
@@ -727,8 +738,96 @@ fovCircle.NumSides, fovCircle.Thickness = 64, 1
 local tintOverlay = newDraw("Square")
 local crosshairLines = {}
 for i = 1, 4 do crosshairLines[i] = newDraw("Line") end
+local galaxyImage = newDraw("Image")
+galaxyImage.Color = theme.white
+pcall(function() galaxyImage.ZIndex = 0 end)
+local galaxyImageAttempted, galaxyImageReady = false, false
+local function ensureGalaxyImage()
+    if galaxyImageAttempted then return end
+    galaxyImageAttempted = true
+    local ok, data = pcall(function()
+        return game:HttpGet("https://raw.githubusercontent.com/hidude455/fallen-matcha/main/assets/galaxy-nebula.png")
+    end)
+    if ok and type(data) == "string" and #data > 1024 and data:sub(1, 4) == "\137PNG" then
+        galaxyImageReady = pcall(function() galaxyImage.Data = data end)
+    end
+end
+local galaxyStars = {}
+local function skyUnit(n, salt)
+    local value = math.sin(n * 12.9898 + salt * 78.233) * 43758.5453
+    return value - math.floor(value)
+end
+for i = 1, 96 do
+    local yaw = skyUnit(i, 1) * math.pi * 2
+    local scatter = skyUnit(i, 2)
+    local elevation
+    if i % 3 == 0 then
+        elevation = 0.08 + scatter * 1.38
+    else
+        elevation = clamp(0.58 + 0.34 * math.sin(yaw + 0.7) + (scatter - 0.5) * 0.35, 0.08, 1.48)
+    end
+    local radius = math.cos(elevation)
+    local color = i % 11 == 0 and theme.violet or (i % 7 == 0 and theme.cyan or theme.white)
+    local drawing = newDraw("Square")
+    drawing.Filled = true
+    pcall(function() drawing.ZIndex = 1 end)
+    local glow
+    if i % 12 == 0 then
+        glow = newDraw("Square")
+        glow.Filled = true
+        pcall(function() glow.ZIndex = 0 end)
+    end
+    galaxyStars[i] = {
+        drawing = drawing, glow = glow, color = color,
+        direction = V3(radius * math.cos(yaw), math.sin(elevation), radius * math.sin(yaw)),
+        size = i % 12 == 0 and 4 or (i % 5 == 0 and 3 or 2),
+        phase = skyUnit(i, 3) * math.pi * 2,
+        speed = 0.6 + skyUnit(i, 4) * 1.4,
+        brightness = 0.72 + skyUnit(i, 5) * 0.38
+    }
+end
+local function hideGalaxy()
+    galaxyImage.Visible = false
+    for _, star in ipairs(galaxyStars) do
+        star.drawing.Visible = false
+        if star.glow then star.glow.Visible = false end
+    end
+end
+local function updateGalaxy(camera, viewport)
+    if not cfg.galaxySky then hideGalaxy(); return end
+    ensureGalaxyImage()
+    local origin = camera.Position
+    local now = tick()
+    local visibleCount = 0
+    for i, star in ipairs(galaxyStars) do
+        local screen, visible = WorldToScreen(origin + star.direction * 500)
+        visible = visible and i <= cfg.galaxyDensity and pointIn(screen.X, screen.Y, 0, 0, viewport.X, viewport.Y)
+        local d = star.drawing
+        d.Visible = visible
+        if star.glow then star.glow.Visible = visible end
+        if visible then
+            visibleCount = visibleCount + 1
+            local size = star.size
+            local opacity = clamp(cfg.galaxyStrength / 100 * (0.82 + 0.18 * math.sin(now * star.speed + star.phase)) * star.brightness, 0, 1)
+            d.Position, d.Size, d.Color, d.Transparency = V2(pixel(screen.X - size / 2), pixel(screen.Y - size / 2)), V2(size, size), star.color, opacity
+            pcall(function() d.Corner = size end)
+            if star.glow then
+                local glowSize = size * 4
+                star.glow.Position, star.glow.Size, star.glow.Color, star.glow.Transparency = V2(pixel(screen.X - glowSize / 2), pixel(screen.Y - glowSize / 2)), V2(glowSize, glowSize), star.color, opacity * 0.18
+                pcall(function() star.glow.Corner = glowSize end)
+            end
+        end
+    end
+    galaxyImage.Visible = galaxyImageReady and visibleCount > 2
+    if galaxyImage.Visible then
+        galaxyImage.Position = V2(0, 0)
+        galaxyImage.Size = V2(viewport.X, pixel(viewport.Y * 0.68))
+        galaxyImage.Transparency = cfg.galaxyStrength / 100 * 0.6
+    end
+end
 local nextHitTime = 0
 local nextWarn = 0
+local skyWarned = false
 local rightShiftWasDown, endWasDown, mouseWasDown = false, false, false
 notify("RIFT v" .. VERSION .. " loaded. Right Shift: menu; End: unload.", "FALLEN / RIFT", 4)
 
@@ -750,6 +849,12 @@ while controller.running do
         local camera = Workspace.CurrentCamera
         local viewport = camera.ViewportSize
         local centerX, centerY = viewport.X / 2, viewport.Y / 2
+        local skyOk = pcall(updateGalaxy, camera, viewport)
+        if not skyOk then
+            cfg.galaxySky = false
+            hideGalaxy()
+            if not skyWarned then notify("Galaxy overlay unavailable in this Matcha build", "FALLEN / RIFT", 5); skyWarned = true end
+        end
         tintOverlay.Position, tintOverlay.Size, tintOverlay.Color = V2(0, 0), viewport, accents[cfg.accent]
         tintOverlay.Filled, tintOverlay.Transparency, tintOverlay.Visible = true, cfg.tintStrength / 100, cfg.screenTint
         pcall(function() tintOverlay.ZIndex = -10 end)

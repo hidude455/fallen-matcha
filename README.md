@@ -20,6 +20,7 @@ Matcha's [classes documentation](https://docs.matchascripts.com/classes) lists `
 
 - `fallen_rift.lua`: the complete script and raw GitHub entry point.
 - `menu-preview.html`: browser mockup of the menu design.
+- `assets/galaxy-nebula.png`: transparent generated nebula artwork for the optional sky effect.
 - `README.md`: setup, controls, and feature notes.
 
 ## Controls and features
@@ -33,11 +34,12 @@ Matcha's [classes documentation](https://docs.matchascripts.com/classes) lists `
 - World → Extra adds projected item outlines, a center crosshair, crosshair sizing, and world range. These are screen-space drawings, not material changes to the game world.
 - Combat adds **Target click** (right mouse held, visible target within 24 screen pixels of the crosshair and within the selected distance) and **Fast click** (hold **V**). Both send ordinary left clicks at the selected interval; hits depend on the equipped tool and Fallen's rules. They do not invoke game damage or tool remotes.
 - Camera → View adds base FOV, **Z**-hold zoom, and an accent-color screen tint. The tint affects the whole screen; Matcha's documented wrappers do not provide a true Sky replacement.
+- Camera → Sky adds an optional galaxy starfield with brightness and density controls. Stars are projected above the horizon, and a transparent nebula image loads from this repository. If the image cannot load, the stars still render. This is a screen-space effect: it cannot replace the game's Sky or hide behind world objects.
 - Camera → Modes adds optional third person and freecam. Freecam uses **WASD** to move, **Q/E** to descend/ascend, arrow keys to look, and **Left Shift** to boost speed. These modes use `Camera.CFrame`; the script turns a mode off and notifies you if this Matcha build cannot write it. They still need an in-game check.
 - Misc includes opt-in local noclip and wall climb. Noclip writes `CanCollide = false` on the local character and restores each original value when switched off or unloaded. Spider climb raises the local root's velocity while holding W against a raycast wall. These movement features depend on Matcha property writes and Fallen's server behavior; they have not been verified in-game.
 - Accent color and tint strength are in Misc. Camera FOV is restored on unload.
 
-The script uses Matcha's `Drawing`, `WorldToScreen`, `Players`, `Workspace:Raycast`, and input APIs. The main script does not use `Instance.new`, direct memory writes, or game remotes. The optional one-line loader above fetches that same source file over HTTP. Matcha does not expose a mesh silhouette API here, so the selected-object outline is a projected convex hull of its visible parts. It cannot be verified as undetected; game moderation and Matcha behavior can change.
+The script uses Matcha's `Drawing`, `WorldToScreen`, `Players`, `Workspace:Raycast`, and input APIs. The main script does not use `Instance.new`, direct memory writes, or game remotes. The optional one-line loader above fetches that same source file over HTTP. The galaxy effect fetches `assets/galaxy-nebula.png` when first enabled. Matcha does not expose a mesh silhouette API here, so the selected-object outline is a projected convex hull of its visible parts. It cannot be verified as undetected; game moderation and Matcha behavior can change.
 
 The menu follows the screenshot you supplied: sidebar, top tabs, dark panel, and violet active state. Version 0.6 has a larger, clearer window with consistent rounded corners and a neutral frame in place of the full-width purple top strip. Text and corner sizes snap to whole pixels, controls highlight on hover, and sliders stay active while dragging outside their tracks. The menu scales down to fit smaller viewports. `menu-preview.html` is a browser mockup of the design; the Lua file builds the real Matcha Drawing menu.
 

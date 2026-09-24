@@ -62,12 +62,25 @@ local function rect(x, y, w, h, color, corner)
     local o = pooled("Square")
     o.Position, o.Size, o.Color = V2(x, y), V2(w, h), color
     o.Filled, o.Transparency, o.Visible = true, 1, true
+    pcall(function() o.Corner = corner or 0 end)
+    pcall(function() o.ZIndex = 10 end)
     return o
+end
+local function styleText(o, size, bold, centered, outlined)
+    local fontOk, font = pcall(function()
+        return bold and Drawing.Fonts.SystemBold or Drawing.Fonts.Monospace
+    end)
+    if fontOk and font then pcall(function() o.Font = font end) end
+    local textSizeOk = pcall(function() o.Size = size or 13 end)
+    if not textSizeOk then pcall(function() o.FontSize = size or 13 end) end
+    pcall(function() o.Outline = outlined or false end)
+    pcall(function() o.Center = centered or false end)
+    pcall(function() o.ZIndex = 30 end)
 end
 local function label(x, y, value, color, size, bold)
     local o = pooled("Text")
     o.Position, o.Text, o.Color = V2(x, y), value, color
-    o.Font, o.FontSize, o.Outline, o.Center = bold and Drawing.Fonts.SystemBold or Drawing.Fonts.Monospace, size or 13, false, false
+    styleText(o, size, bold, false, false)
     o.Transparency, o.Visible = 1, true
     return o
 end
@@ -75,6 +88,7 @@ local function line(x1, y1, x2, y2, color, thickness)
     local o = pooled("Line")
     o.From, o.To, o.Color, o.Thickness = V2(x1, y1), V2(x2, y2), color, thickness or 1
     o.Transparency, o.Visible = 1, true
+    pcall(function() o.ZIndex = 20 end)
     return o
 end
 local function hideUnused()
@@ -209,7 +223,7 @@ end
 local function newEspEntry()
     local e = { lines = {}, name = newDraw("Text"), hpBack = newDraw("Square"), hpFill = newDraw("Square"), snap = newDraw("Line") }
     for i = 1, 4 do e.lines[i] = newDraw("Line") end
-    e.name.Font, e.name.FontSize, e.name.Center, e.name.Outline = Drawing.Fonts.Monospace, 12, true, true
+    styleText(e.name, 12, false, true, true)
     return e
 end
 local function hideEsp(e)
@@ -321,7 +335,7 @@ end
 local function newWorldDrawing()
     local e = { ring = newDraw("Circle"), text = newDraw("Text") }
     e.ring.Radius, e.ring.NumSides, e.ring.Thickness = 5, 16, 2
-    e.text.Font, e.text.FontSize, e.text.Center, e.text.Outline = Drawing.Fonts.Monospace, 11, true, true
+    styleText(e.text, 11, false, true, true)
     return e
 end
 local function hideWorld()
